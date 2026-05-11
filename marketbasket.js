@@ -501,7 +501,7 @@
     var barLayout = {
       paper_bgcolor: "rgba(0,0,0,0)",
       plot_bgcolor: "rgba(0,0,0,0)",
-      margin: { t: 36, r: 50, b: 24, l: 120 },
+      margin: { t: 36, r: 70, b: 24, l: 120 },
       bargap: 0.35,
       yaxis: { autorange: "reversed", tickfont: { size: 10 } },
       xaxis: { gridcolor: COLORS.grid },
@@ -537,7 +537,7 @@
       hovertemplate: "%{customdata[0]}<br>Pair Count: %{x:,}<br>Rules: %{customdata[1]}<extra></extra>"
     }], Object.assign({}, barLayout, {
       title: { text: "Top Cross-Category Flows", font: { size: 13 } },
-      margin: { t: 36, r: 50, b: 24, l: 150 }
+      margin: { t: 36, r: 70, b: 24, l: 150 }
     }), { responsive: true, displayModeBar: false });
 
     Plotly.newPlot("scatterChart", [{
@@ -558,7 +558,7 @@
       title: { text: "Confidence vs Lift (bubble = pair count)", font: { size: 13 } },
       paper_bgcolor: "rgba(0,0,0,0)",
       plot_bgcolor: "rgba(0,0,0,0)",
-      margin: { t: 36, r: 20, b: 50, l: 55 },
+      margin: { t: 36, r: 10, b: 50, l: 60 },
       xaxis: { title: "Confidence", tickformat: ".0%", gridcolor: COLORS.grid },
       yaxis: { title: "Lift", gridcolor: COLORS.grid },
       font: { color: COLORS.text, size: 11 },
