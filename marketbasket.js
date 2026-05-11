@@ -498,52 +498,47 @@
 
   function renderCharts(records) {
     var topCategories = aggregateTopCategories(records);
-    var barMargin = { t: 40, r: 60, b: 30, l: 10 };
+    var barLayout = {
+      paper_bgcolor: "rgba(0,0,0,0)",
+      plot_bgcolor: "rgba(0,0,0,0)",
+      margin: { t: 36, r: 50, b: 24, l: 120 },
+      bargap: 0.35,
+      yaxis: { autorange: "reversed", tickfont: { size: 10 } },
+      xaxis: { gridcolor: COLORS.grid },
+      font: { color: COLORS.text, size: 10 },
+      autosize: true
+    };
     Plotly.newPlot("topCategoryChart", [{
       x: topCategories.map(function (i) { return i.totalPairs; }),
-      y: topCategories.map(function (i) { return i.name.length > 22 ? i.name.substring(0, 20) + "..." : i.name; }),
+      y: topCategories.map(function (i) { return i.name; }),
       type: "bar",
       orientation: "h",
       marker: { color: COLORS.within },
       text: topCategories.map(function (i) { return formatNumber(i.totalPairs); }),
       textposition: "outside",
+      textfont: { size: 10 },
       customdata: topCategories.map(function (i) { return [i.name, i.rules, i.avgConfidence]; }),
       hovertemplate: "%{customdata[0]}<br>Pair Count: %{x:,}<br>Rules: %{customdata[1]}<br>Avg Confidence: %{customdata[2]:.1%}<extra></extra>"
-    }], {
-      title: { text: "Top Antecedent Categories by Pair Count", font: { size: 14 } },
-      paper_bgcolor: "rgba(0,0,0,0)",
-      plot_bgcolor: "rgba(0,0,0,0)",
-      margin: barMargin,
-      yaxis: { autorange: "reversed", tickfont: { size: 11 } },
-      xaxis: { gridcolor: COLORS.grid },
-      font: { color: COLORS.text, size: 11 },
-      autosize: true
-    }, { responsive: true, displayModeBar: false });
+    }], Object.assign({}, barLayout, {
+      title: { text: "Top Antecedent Categories", font: { size: 13 } }
+    }), { responsive: true, displayModeBar: false });
 
     var crossFlows = aggregateCrossFlows(records);
     Plotly.newPlot("crossFlowChart", [{
       x: crossFlows.map(function (i) { return i.pairCount; }),
-      y: crossFlows.map(function (i) {
-        var f = i.flow;
-        return f.length > 22 ? f.substring(0, 20) + "..." : f;
-      }),
+      y: crossFlows.map(function (i) { return i.flow; }),
       type: "bar",
       orientation: "h",
       marker: { color: COLORS.cross },
       text: crossFlows.map(function (i) { return formatNumber(i.pairCount); }),
       textposition: "outside",
+      textfont: { size: 10 },
       customdata: crossFlows.map(function (i) { return [i.flow, i.rules]; }),
       hovertemplate: "%{customdata[0]}<br>Pair Count: %{x:,}<br>Rules: %{customdata[1]}<extra></extra>"
-    }], {
-      title: { text: "Top Cross-Category Flows", font: { size: 14 } },
-      paper_bgcolor: "rgba(0,0,0,0)",
-      plot_bgcolor: "rgba(0,0,0,0)",
-      margin: barMargin,
-      yaxis: { autorange: "reversed", tickfont: { size: 11 } },
-      xaxis: { gridcolor: COLORS.grid },
-      font: { color: COLORS.text, size: 11 },
-      autosize: true
-    }, { responsive: true, displayModeBar: false });
+    }], Object.assign({}, barLayout, {
+      title: { text: "Top Cross-Category Flows", font: { size: 13 } },
+      margin: { t: 36, r: 50, b: 24, l: 150 }
+    }), { responsive: true, displayModeBar: false });
 
     Plotly.newPlot("scatterChart", [{
       x: records.map(function (i) { return i.confidence; }),
@@ -560,10 +555,10 @@
       customdata: records.map(function (i) { return [i.pair_count, i.itemset_size, i.analysis_type_label]; }),
       hovertemplate: "%{text}<br>Confidence: %{x:.1%}<br>Lift: %{y:.2f}<br>Pair Count: %{customdata[0]:,}<br>Itemset: %{customdata[1]}<br>Type: %{customdata[2]}<extra></extra>"
     }], {
-      title: { text: "Confidence vs Lift (bubble size = pair count)", font: { size: 14 } },
+      title: { text: "Confidence vs Lift (bubble = pair count)", font: { size: 13 } },
       paper_bgcolor: "rgba(0,0,0,0)",
       plot_bgcolor: "rgba(0,0,0,0)",
-      margin: { t: 40, r: 30, b: 50, l: 60 },
+      margin: { t: 36, r: 20, b: 50, l: 55 },
       xaxis: { title: "Confidence", tickformat: ".0%", gridcolor: COLORS.grid },
       yaxis: { title: "Lift", gridcolor: COLORS.grid },
       font: { color: COLORS.text, size: 11 },
