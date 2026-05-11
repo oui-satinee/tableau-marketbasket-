@@ -61,14 +61,25 @@
   }
 
   // ─── Column auto-detect ────────────────────────────────
+  function normalize(name) {
+    return name.toLowerCase().trim().replace(/[_\s-]+/g, "");
+  }
+
   function buildColumnIndex(columns) {
     var index = {};
     columns.forEach(function (col, i) {
       var name = col.fieldName.toLowerCase().trim();
+      var nameNorm = normalize(name);
       Object.keys(COLUMN_MAP).forEach(function (field) {
         if (index[field]) return;
         var aliases = COLUMN_MAP[field].map(function (a) { return a.toLowerCase(); });
+        // exact match first
         if (aliases.indexOf(name) !== -1) {
+          index[field] = i;
+          return;
+        }
+        // normalized match (strip all underscores, spaces, dashes)
+        if (aliases.some(function (a) { return normalize(a) === nameNorm; })) {
           index[field] = i;
         }
       });
