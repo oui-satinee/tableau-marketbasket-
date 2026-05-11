@@ -65,11 +65,18 @@
     return name.toLowerCase().trim().replace(/[_\s-]+/g, "");
   }
 
+  function stripAggregation(name) {
+    // Remove Tableau aggregation prefixes: SUM(...), AVG(...), CNT(...), etc.
+    return name.replace(/^(sum|avg|cnt|count|min|max|attr|median|stdev|var)\s*\(\s*/i, "").replace(/\s*\)$/, "");
+  }
+
   function buildColumnIndex(columns) {
     var index = {};
     columns.forEach(function (col, i) {
       var name = col.fieldName.toLowerCase().trim();
+      var strippedName = stripAggregation(name).toLowerCase().trim();
       var nameNorm = normalize(name);
+      var strippedNorm = normalize(strippedName);
       Object.keys(COLUMN_MAP).forEach(function (field) {
         if (index[field]) return;
         var aliases = COLUMN_MAP[field].map(function (a) { return a.toLowerCase(); });
@@ -80,6 +87,15 @@
         }
         // normalized match (strip all underscores, spaces, dashes)
         if (aliases.some(function (a) { return normalize(a) === nameNorm; })) {
+          index[field] = i;
+          return;
+        }
+        // match after stripping aggregation: SUM(Pair Count) → pair count
+        if (aliases.indexOf(strippedName) !== -1) {
+          index[field] = i;
+          return;
+        }
+        if (aliases.some(function (a) { return normalize(a) === strippedNorm; })) {
           index[field] = i;
         }
       });
