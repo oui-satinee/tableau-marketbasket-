@@ -87,11 +87,41 @@
     return index;
   }
 
+  // ─── Debug helper ─────────────────────────────────────
+  function showDebugInfo(dataTable, colIndex) {
+    var columns = dataTable.columns;
+    var rows = dataTable.data;
+    var debugHtml = '<div style="background:#fffbe6;border:1px solid #e6d966;border-radius:12px;padding:16px;margin:16px 0;font-size:12px;max-height:400px;overflow:auto;">';
+    debugHtml += '<h3 style="margin:0 0 8px;color:#8a4b2a;">Debug: Column Detection</h3>';
+    debugHtml += '<p><strong>Total columns from Tableau:</strong> ' + columns.length + '</p>';
+    debugHtml += '<p><strong>Total rows:</strong> ' + rows.length + '</p>';
+    debugHtml += '<table style="border-collapse:collapse;font-size:11px;"><tr style="background:#f0e6d3;"><th style="padding:4px 8px;border:1px solid #ccc;">#</th><th style="padding:4px 8px;border:1px solid #ccc;">Tableau Field Name</th><th style="padding:4px 8px;border:1px solid #ccc;">Matched To</th><th style="padding:4px 8px;border:1px solid #ccc;">Sample Value (row 1)</th></tr>';
+    columns.forEach(function (col, i) {
+      var matched = Object.keys(colIndex).find(function (k) { return colIndex[k] === i; }) || "-";
+      var sampleVal = rows[0] && rows[0][i] ? (rows[0][i].value !== undefined ? rows[0][i].value : rows[0][i].formattedValue) : "-";
+      var sampleStr = String(sampleVal).substring(0, 50);
+      debugHtml += '<tr><td style="padding:4px 8px;border:1px solid #eee;">' + i + '</td><td style="padding:4px 8px;border:1px solid #eee;">' + col.fieldName + '</td><td style="padding:4px 8px;border:1px solid #eee;color:' + (matched !== "-" ? "green" : "red") + ';font-weight:bold;">' + matched + '</td><td style="padding:4px 8px;border:1px solid #eee;">' + sampleStr + '</td></tr>';
+    });
+    debugHtml += '</table>';
+    debugHtml += '<p style="margin-top:8px;"><strong>Unmatched internal fields:</strong> ';
+    var unmatched = ["analysis_type","category_antecedent","category_consequent","antecedent_name","consequent_name","pair_count","support","confidence","lift","leverage","conviction","itemset_size"].filter(function (f) { return colIndex[f] === undefined; });
+    debugHtml += unmatched.length === 0 ? '<span style="color:green;">All matched!</span>' : '<span style="color:red;">' + unmatched.join(", ") + '</span>';
+    debugHtml += '</p></div>';
+    var configPanel = document.getElementById("configPanel");
+    var debugDiv = document.createElement("div");
+    debugDiv.id = "debugPanel";
+    debugDiv.innerHTML = debugHtml;
+    configPanel.after(debugDiv);
+  }
+
   // ─── Data extraction from Tableau ──────────────────────
   function extractRecords(dataTable) {
     var columns = dataTable.columns;
     var rows = dataTable.data;
     var colIndex = buildColumnIndex(columns);
+
+    // Show debug info
+    showDebugInfo(dataTable, colIndex);
 
     return rows.map(function (row, i) {
       function val(field) {
