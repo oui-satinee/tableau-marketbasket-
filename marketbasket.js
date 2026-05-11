@@ -103,41 +103,11 @@
     return index;
   }
 
-  // ─── Debug helper ─────────────────────────────────────
-  function showDebugInfo(dataTable, colIndex) {
-    var columns = dataTable.columns;
-    var rows = dataTable.data;
-    var debugHtml = '<div style="background:#fffbe6;border:1px solid #e6d966;border-radius:12px;padding:16px;margin:16px 0;font-size:12px;max-height:400px;overflow:auto;">';
-    debugHtml += '<h3 style="margin:0 0 8px;color:#8a4b2a;">Debug: Column Detection</h3>';
-    debugHtml += '<p><strong>Total columns from Tableau:</strong> ' + columns.length + '</p>';
-    debugHtml += '<p><strong>Total rows:</strong> ' + rows.length + '</p>';
-    debugHtml += '<table style="border-collapse:collapse;font-size:11px;"><tr style="background:#f0e6d3;"><th style="padding:4px 8px;border:1px solid #ccc;">#</th><th style="padding:4px 8px;border:1px solid #ccc;">Tableau Field Name</th><th style="padding:4px 8px;border:1px solid #ccc;">Matched To</th><th style="padding:4px 8px;border:1px solid #ccc;">Sample Value (row 1)</th></tr>';
-    columns.forEach(function (col, i) {
-      var matched = Object.keys(colIndex).find(function (k) { return colIndex[k] === i; }) || "-";
-      var sampleVal = rows[0] && rows[0][i] ? (rows[0][i].value !== undefined ? rows[0][i].value : rows[0][i].formattedValue) : "-";
-      var sampleStr = String(sampleVal).substring(0, 50);
-      debugHtml += '<tr><td style="padding:4px 8px;border:1px solid #eee;">' + i + '</td><td style="padding:4px 8px;border:1px solid #eee;">' + col.fieldName + '</td><td style="padding:4px 8px;border:1px solid #eee;color:' + (matched !== "-" ? "green" : "red") + ';font-weight:bold;">' + matched + '</td><td style="padding:4px 8px;border:1px solid #eee;">' + sampleStr + '</td></tr>';
-    });
-    debugHtml += '</table>';
-    debugHtml += '<p style="margin-top:8px;"><strong>Unmatched internal fields:</strong> ';
-    var unmatched = ["analysis_type","category_antecedent","category_consequent","antecedent_name","consequent_name","pair_count","support","confidence","lift","leverage","conviction","itemset_size"].filter(function (f) { return colIndex[f] === undefined; });
-    debugHtml += unmatched.length === 0 ? '<span style="color:green;">All matched!</span>' : '<span style="color:red;">' + unmatched.join(", ") + '</span>';
-    debugHtml += '</p></div>';
-    var configPanel = document.getElementById("configPanel");
-    var debugDiv = document.createElement("div");
-    debugDiv.id = "debugPanel";
-    debugDiv.innerHTML = debugHtml;
-    configPanel.after(debugDiv);
-  }
-
   // ─── Data extraction from Tableau ──────────────────────
   function extractRecords(dataTable) {
     var columns = dataTable.columns;
     var rows = dataTable.data;
     var colIndex = buildColumnIndex(columns);
-
-    // Show debug info
-    showDebugInfo(dataTable, colIndex);
 
     return rows.map(function (row, i) {
       function val(field) {
@@ -432,16 +402,16 @@
     var topCat = topCategory(records);
     var topRule = bestRule(records);
     document.getElementById("kpi-grid").innerHTML = [
-      { label: "Filtered Rules", value: formatNumber(s.totalRules), sub: "Within: " + formatNumber(s.withinRules) + " | Cross: " + formatNumber(s.crossRules) },
-      { label: "Total Pair Count", value: formatNumber(s.totalPairCount), sub: "Pairs: " + formatNumber(s.pairRules) + " | Triplets: " + formatNumber(s.tripletRules) },
-      { label: "Average Opportunity", value: formatNumber(s.avgOpportunity, 1), sub: "Composite score (0-100)" },
-      { label: "Average Lift", value: formatNumber(s.avgLift, 2), sub: "Max lift: " + formatNumber(s.maxLift, 2) },
-      { label: "Top Opportunity Rule", value: topRule ? (topRule.antecedent_name.substring(0, 30) + " → " + topRule.consequent_name.substring(0, 20)) : "-", sub: topRule ? "Opp: " + formatNumber(topRule.opportunity_score, 1) + " | Conf: " + formatPercent(topRule.confidence, 1) : "" },
-      { label: "Average Confidence", value: formatPercent(s.avgConfidence, 1), sub: "Across " + formatNumber(s.totalRules) + " rules" },
-      { label: "Top Category", value: topCat.name.substring(0, 25), sub: formatNumber(topCat.pairs) + " pairs | " + formatNumber(topCat.rules) + " rules" },
-      { label: "Unique Products", value: formatNumber(s.uniqueProducts), sub: "Distinct items in rules" }
+      { label: "Filtered Rules", value: formatNumber(s.totalRules), sub: "Within: " + formatNumber(s.withinRules) + " | Cross: " + formatNumber(s.crossRules), sm: false },
+      { label: "Total Pair Count", value: formatNumber(s.totalPairCount), sub: "Pairs: " + formatNumber(s.pairRules) + " | Triplets: " + formatNumber(s.tripletRules), sm: false },
+      { label: "Average Opportunity", value: formatNumber(s.avgOpportunity, 1), sub: "Composite score (0-100)", sm: false },
+      { label: "Average Lift", value: formatNumber(s.avgLift, 2), sub: "Max lift: " + formatNumber(s.maxLift, 2), sm: false },
+      { label: "Top Opportunity Rule", value: topRule ? (topRule.antecedent_name.substring(0, 40) + " → " + topRule.consequent_name.substring(0, 30)) : "-", sub: topRule ? "Opp: " + formatNumber(topRule.opportunity_score, 1) + " | Conf: " + formatPercent(topRule.confidence, 1) : "", sm: true },
+      { label: "Average Confidence", value: formatPercent(s.avgConfidence, 1), sub: "Across " + formatNumber(s.totalRules) + " rules", sm: false },
+      { label: "Top Category", value: topCat.name.substring(0, 35), sub: formatNumber(topCat.pairs) + " pairs | " + formatNumber(topCat.rules) + " rules", sm: true },
+      { label: "Unique Products", value: formatNumber(s.uniqueProducts), sub: "Distinct items in rules", sm: false }
     ].map(function (kpi) {
-      return '<div class="kpi-card"><div class="kpi-label">' + kpi.label + '</div><div class="kpi-value">' + kpi.value + '</div><div class="kpi-sub">' + kpi.sub + "</div></div>";
+      return '<div class="kpi-card"><div class="kpi-label">' + kpi.label + '</div><div class="kpi-value' + (kpi.sm ? " sm" : "") + '">' + kpi.value + '</div><div class="kpi-sub">' + kpi.sub + "</div></div>";
     }).join("");
   }
 
