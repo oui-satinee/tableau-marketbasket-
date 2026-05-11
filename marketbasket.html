@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Market Basket Dashboard</title>
+  <script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
+  <script src="../../../lib/tableau.extensions.1.latest.js"></script>
+  <style>
+    :root {
+      --bg: #f3f0ea;
+      --surface: #fffdfa;
+      --surface-soft: #f7f3ed;
+      --text: #24323d;
+      --muted: #697a86;
+      --line: #dfd6cb;
+      --primary: #8a4b2a;
+      --primary-strong: #65361d;
+      --accent: #1b6f73;
+      --accent-soft: #dff1ee;
+      --success: #2f7d4a;
+      --warn: #d27c2c;
+      --danger: #c95555;
+      --shadow: 0 16px 40px rgba(71, 52, 35, 0.08);
+      --radius: 18px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "Noto Sans Thai", sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(255,255,255,0.9), transparent 30%),
+        linear-gradient(135deg, #f3ede4 0%, #f7f4ef 48%, #eef5f4 100%);
+      color: var(--text);
+    }
+    .shell {
+      max-width: 1480px;
+      margin: 0 auto;
+      padding: 28px;
+    }
+    .hero {
+      background: linear-gradient(135deg, #4d2d1f 0%, #8a4b2a 40%, #1b6f73 100%);
+      color: #fff;
+      border-radius: 28px;
+      padding: 28px 30px;
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: auto -80px -90px auto;
+      width: 240px;
+      height: 240px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 999px;
+      filter: blur(4px);
+    }
+    .eyebrow {
+      font-size: 12px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      opacity: 0.85;
+      margin-bottom: 10px;
+    }
+    .hero h1 {
+      margin: 0;
+      font-size: 34px;
+      line-height: 1.15;
+    }
+    .hero-copy {
+      max-width: 920px;
+      margin-top: 14px;
+      font-size: 15px;
+      line-height: 1.7;
+      opacity: 0.93;
+    }
+    .hero-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 18px;
+      font-size: 12px;
+    }
+    .hero-meta span {
+      background: rgba(255,255,255,0.14);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 999px;
+      padding: 7px 12px;
+    }
+    .section {
+      margin-top: 22px;
+      background: var(--surface);
+      border: 1px solid rgba(117, 92, 70, 0.08);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      padding: 22px;
+    }
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .section-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid var(--line);
+      background: var(--surface-soft);
+      color: var(--text);
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .collapsible-body {
+      display: block;
+    }
+    .is-collapsed .collapsible-body {
+      display: none;
+    }
+    .section h2 {
+      margin: 0;
+      font-size: 20px;
+      color: var(--primary-strong);
+    }
+    .section-note {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+    }
+    .kpi-card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(247,243,237,0.95));
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 16px;
+    }
+    .kpi-label {
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .kpi-value {
+      margin-top: 10px;
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--primary-strong);
+    }
+    .kpi-sub {
+      margin-top: 8px;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+    .insight-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+    .insight-card {
+      background: linear-gradient(135deg, rgba(223,241,238,0.55), rgba(255,248,240,0.95));
+      border: 1px solid rgba(27,111,115,0.16);
+      border-radius: 20px;
+      padding: 18px;
+    }
+    .insight-chip {
+      display: inline-block;
+      padding: 5px 10px;
+      border-radius: 999px;
+      background: rgba(27,111,115,0.12);
+      color: var(--accent);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+    .insight-title {
+      margin-top: 12px;
+      font-size: 18px;
+      color: var(--primary-strong);
+      font-weight: 700;
+    }
+    .insight-body {
+      margin-top: 8px;
+      color: var(--text);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+    .filter-grid {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 12px;
+      align-items: end;
+    }
+    .field label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 600;
+    }
+    .field select,
+    .field input {
+      width: 100%;
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--text);
+      border-radius: 12px;
+      padding: 11px 12px;
+      font-size: 14px;
+    }
+    .actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    button {
+      border: none;
+      border-radius: 12px;
+      padding: 11px 14px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn-primary {
+      background: var(--primary);
+      color: #fff;
+    }
+    .btn-secondary {
+      background: var(--surface-soft);
+      color: var(--text);
+      border: 1px solid var(--line);
+    }
+    .stats-line {
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 13px;
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .chart-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+    .chart-card {
+      background: var(--surface-soft);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 12px;
+      min-height: 380px;
+    }
+    .chart-card.wide {
+      grid-column: span 2;
+    }
+    .table-wrap {
+      overflow: auto;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: #fff;
+      max-height: 520px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 1180px;
+    }
+    thead th {
+      position: sticky;
+      top: 0;
+      background: #f6f1ea;
+      z-index: 1;
+      text-align: left;
+      font-size: 12px;
+      letter-spacing: 0.03em;
+      color: var(--primary-strong);
+      padding: 12px 10px;
+      border-bottom: 1px solid var(--line);
+    }
+    tbody td {
+      padding: 11px 10px;
+      border-bottom: 1px solid #eee5db;
+      font-size: 13px;
+      vertical-align: top;
+    }
+    tbody tr:hover {
+      background: #fbf7f1;
+    }
+    .num {
+      text-align: right;
+      white-space: nowrap;
+      font-variant-numeric: tabular-nums;
+    }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .pill.within {
+      background: rgba(138,75,42,0.12);
+      color: var(--primary);
+    }
+    .pill.cross {
+      background: rgba(27,111,115,0.12);
+      color: var(--accent);
+    }
+    .helper-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+    .helper-card {
+      background: linear-gradient(180deg, #fff, #f7f3ed);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 16px;
+    }
+    .helper-card h3 {
+      margin: 0 0 10px 0;
+      color: var(--primary-strong);
+      font-size: 16px;
+    }
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+    }
+    .metric-card {
+      background: linear-gradient(180deg, #fff, #f7f3ed);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 16px;
+    }
+    .metric-card h3 {
+      margin: 0;
+      font-size: 14px;
+      color: var(--primary-strong);
+    }
+    .metric-card p {
+      margin: 8px 0 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.65;
+    }
+    .helper-list {
+      margin: 0;
+      padding-left: 18px;
+      color: var(--text);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+    .footer {
+      color: var(--muted);
+      font-size: 12px;
+      text-align: center;
+      margin: 18px 0 10px;
+    }
+    .config-panel {
+      margin-top: 22px;
+      background: linear-gradient(135deg, rgba(27,111,115,0.08), rgba(138,75,42,0.06));
+      border: 1px solid rgba(27,111,115,0.2);
+      border-radius: 24px;
+      padding: 22px;
+    }
+    .config-panel h2 {
+      margin: 0 0 8px 0;
+      font-size: 18px;
+      color: var(--accent);
+    }
+    .config-panel .section-note {
+      margin-bottom: 14px;
+    }
+    .config-row {
+      display: flex;
+      gap: 12px;
+      align-items: end;
+      flex-wrap: wrap;
+    }
+    .config-row select {
+      min-width: 240px;
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--text);
+      border-radius: 12px;
+      padding: 11px 12px;
+      font-size: 14px;
+    }
+    .loading-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(243,240,234,0.85);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+    .loading-overlay.active {
+      display: flex;
+    }
+    .loading-box {
+      background: var(--surface);
+      border-radius: 24px;
+      padding: 32px 40px;
+      box-shadow: var(--shadow);
+      text-align: center;
+    }
+    .loading-box h3 {
+      margin: 0 0 8px;
+      color: var(--primary-strong);
+    }
+    .loading-box p {
+      color: var(--muted);
+      font-size: 13px;
+      margin: 0;
+    }
+    .error-banner {
+      display: none;
+      margin-top: 22px;
+      background: #fff5f5;
+      border: 1px solid rgba(201,85,85,0.3);
+      border-radius: 16px;
+      padding: 16px 20px;
+      color: var(--danger);
+      font-size: 14px;
+    }
+    .error-banner.active {
+      display: block;
+    }
+    @media (max-width: 1180px) {
+      .kpi-grid,
+      .filter-grid,
+      .chart-grid,
+      .insight-grid,
+      .helper-grid,
+      .metric-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      .chart-card.wide {
+        grid-column: span 2;
+      }
+    }
+    @media (max-width: 720px) {
+      .shell { padding: 14px; }
+      .hero { padding: 22px 18px; }
+      .hero h1 { font-size: 28px; }
+      .kpi-grid,
+      .filter-grid,
+      .chart-grid,
+      .insight-grid,
+      .helper-grid,
+      .metric-grid {
+        grid-template-columns: 1fr;
+      }
+      .chart-card.wide {
+        grid-column: span 1;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-box">
+      <h3>Loading Market Basket Data</h3>
+      <p id="loadingMessage">Reading data from Tableau worksheet...</p>
+    </div>
+  </div>
+
+  <div class="shell">
+    <section class="hero">
+      <div class="eyebrow">Tableau Extension</div>
+      <h1>Market Basket Dashboard</h1>
+      <div class="hero-copy">
+        รายงานนี้สรุปกฎการซื้อร่วม เพื่อช่วยมองหา cross-sell, bundle และหมวดสินค้าที่ควรออกแบบโปรโมชันร่วมกัน
+      </div>
+      <div class="hero-meta">
+        <span>Data source: Tableau Worksheet</span>
+        <span id="generated-at"></span>
+      </div>
+    </section>
+
+    <div class="error-banner" id="errorBanner"></div>
+
+    <section class="config-panel" id="configPanel">
+      <h2>Data Source Configuration</h2>
+      <div class="section-note">เลือก worksheet ที่มีข้อมูล Market Basket Rules ของคุณ</div>
+      <div class="config-row">
+        <div class="field">
+          <label for="worksheetSelect">Worksheet</label>
+          <select id="worksheetSelect"><option value="">-- Select a worksheet --</option></select>
+        </div>
+        <button id="loadDataBtn" class="btn-primary">Load Data</button>
+      </div>
+    </section>
+
+    <section class="section" id="dashboardContent" style="display:none">
+      <div class="section-header">
+        <div>
+          <h2>Executive Summary</h2>
+          <div class="section-note">ภาพรวมจะอัปเดตตาม filter ที่เลือก เพื่อให้ดูผลกระทบของ segment ที่สนใจได้ทันที</div>
+        </div>
+      </div>
+      <div id="kpi-grid" class="kpi-grid"></div>
+    </section>
+
+    <section class="section" id="filterSection" style="display:none">
+      <div class="section-header">
+        <div>
+          <h2>Filters & Export</h2>
+          <div class="section-note">กรองได้ทั้งชนิดของ rule, itemset, หมวดสินค้า และรูปแบบการเรียงลำดับ</div>
+        </div>
+      </div>
+      <div class="filter-grid">
+        <div class="field">
+          <label for="analysisType">Analysis Type</label>
+          <select id="analysisType"></select>
+        </div>
+        <div class="field">
+          <label for="itemsetSize">Itemset Size</label>
+          <select id="itemsetSize"></select>
+        </div>
+        <div class="field">
+          <label for="antecedentCategory">Antecedent Category</label>
+          <select id="antecedentCategory"></select>
+        </div>
+        <div class="field">
+          <label for="consequentCategory">Consequent Category</label>
+          <select id="consequentCategory"></select>
+        </div>
+        <div class="field">
+          <label for="sortBy">Sort By</label>
+          <select id="sortBy">
+            <option value="opportunity_score_desc">Opportunity Score</option>
+            <option value="pair_count_desc">Pair Count</option>
+            <option value="confidence_desc">Confidence</option>
+            <option value="lift_desc">Lift</option>
+            <option value="support_desc">Support</option>
+          </select>
+        </div>
+      </div>
+      <div class="actions" style="margin-top:14px">
+        <button id="resetBtn" class="btn-secondary">Reset Filters</button>
+        <button id="exportBtn" class="btn-primary">Export Filtered Data</button>
+      </div>
+      <div id="statsLine" class="stats-line"></div>
+    </section>
+
+    <section class="section is-collapsed" id="visualAnalysisSection" style="display:none">
+      <div class="section-header">
+        <div>
+          <h2>Visual Analysis</h2>
+          <div class="section-note">โฟกัสเฉพาะมุมที่ช่วยตัดสินใจเรื่องหมวดที่ขับ volume, cross-category flow และความสัมพันธ์ระหว่าง confidence กับ lift</div>
+        </div>
+        <button type="button" class="section-toggle" data-target="visualAnalysisSection" aria-expanded="false">Show</button>
+      </div>
+      <div class="collapsible-body">
+      <div class="chart-grid">
+        <div class="chart-card"><div id="topCategoryChart"></div></div>
+        <div class="chart-card"><div id="crossFlowChart"></div></div>
+        <div class="chart-card wide"><div id="scatterChart"></div></div>
+      </div>
+      </div>
+    </section>
+
+    <section class="section" id="ruleDetailSection" style="display:none">
+      <div class="section-header">
+        <div>
+          <h2>Rule Detail</h2>
+          <div class="section-note">ตารางนี้แสดงเฉพาะข้อมูลหลังกรอง และ export จะใช้ชุดข้อมูลเดียวกัน</div>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Analysis Type</th>
+              <th>Antecedent Category</th>
+              <th>Consequent Category</th>
+              <th>Antecedent</th>
+              <th>Consequent</th>
+              <th class="num">Opportunity Score</th>
+              <th class="num">Pair Count</th>
+              <th class="num">Support</th>
+              <th class="num">Confidence</th>
+              <th class="num">Lift</th>
+              <th class="num">Leverage</th>
+              <th class="num">Conviction</th>
+              <th class="num">Itemset</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section" id="insightSection" style="display:none">
+      <div class="section-header">
+        <div>
+          <h2>Business Insights</h2>
+          <div class="section-note">สรุป insight เชิงธุรกิจจากข้อมูลที่กรองอยู่ในปัจจุบัน</div>
+        </div>
+      </div>
+      <div id="insight-grid" class="insight-grid"></div>
+    </section>
+
+    <section class="section is-collapsed" id="howToReadMetricsSection" style="display:none">
+      <div class="section-header">
+        <div>
+          <h2>How To Read Metrics</h2>
+          <div class="section-note">คำอธิบายสั้น ๆ สำหรับ user เพื่อใช้ตีความทั้งกฎและแต่ละคอลัมน์ในรายงาน</div>
+        </div>
+        <button type="button" class="section-toggle" data-target="howToReadMetricsSection" aria-expanded="false">Show</button>
+      </div>
+      <div class="collapsible-body">
+      <div class="metric-grid">
+        <div class="metric-card"><h3>Rule</h3><p>หนึ่งแถวในรายงานคือกฎการซื้อร่วม บอกว่าสินค้าในฝั่ง antecedent มักนำไปสู่สินค้าในฝั่ง consequent</p></div>
+        <div class="metric-card"><h3>Antecedent</h3><p>สินค้าต้นทางหรือชุดสินค้าที่ลูกค้าหยิบก่อน เป็นจุดตั้งต้นของกฎการซื้อร่วม</p></div>
+        <div class="metric-card"><h3>Consequent</h3><p>สินค้าที่มักตามมาหลังจากซื้อ antecedent จึงเหมาะใช้เป็นสินค้าที่ควรแนะนำเพิ่ม</p></div>
+        <div class="metric-card"><h3>Pair Count</h3><p>จำนวนครั้งที่ชุดสินค้าคู่นี้เกิดขึ้นจริง ยิ่งสูงยิ่งมีน้ำหนักเชิง volume และเหมาะใช้ทำแคมเปญกว้าง</p></div>
+        <div class="metric-card"><h3>Support</h3><p>สัดส่วนของธุรกรรมทั้งหมดที่พบกฎนี้ ช่วยบอกว่ากฎนี้ใหญ่พอในภาพรวมมากแค่ไหน</p></div>
+        <div class="metric-card"><h3>Confidence</h3><p>ถ้าลูกค้าซื้อ antecedent แล้ว มีโอกาสกี่เปอร์เซ็นต์ที่จะซื้อ consequent ต่อ ยิ่งสูงยิ่งเหมาะใช้ทำ recommendation</p></div>
+        <div class="metric-card"><h3>Lift</h3><p>วัดว่าความสัมพันธ์นี้แรงกว่าการซื้อแบบบังเอิญกี่เท่า ค่าเกิน 1 แปลว่ามีความสัมพันธ์จริง และยิ่งสูงยิ่งน่าสนใจ</p></div>
+        <div class="metric-card"><h3>Opportunity Score</h3><p>คะแนนกลาง 0-100 ที่รวม volume, confidence, lift และ support เพื่อช่วยจัดลำดับว่ากฎไหนน่าหยิบไปใช้ทางธุรกิจมากที่สุด</p></div>
+        <div class="metric-card"><h3>Leverage</h3><p>บอกส่วนต่างระหว่างสิ่งที่เกิดขึ้นจริงกับสิ่งที่ควรเกิดถ้าสองสินค้านี้ไม่เกี่ยวกัน ช่วยดู impact เชิงปริมาณ</p></div>
+        <div class="metric-card"><h3>Conviction</h3><p>ใช้ดูทิศทางและความน่าเชื่อถือของกฎ ถ้าค่าสูง แปลว่า antecedent มีแนวโน้มพาไปสู่ consequent มากขึ้น</p></div>
+        <div class="metric-card"><h3>Itemset</h3><p>จำนวนสินค้าที่อยู่ในกฎนั้น ถ้าเป็น 2 คือ pair rule และถ้าเป็น 3 คือ triplet rule ซึ่งมักใช้มอง bundle ที่ซับซ้อนขึ้น</p></div>
+      </div>
+      </div>
+    </section>
+
+    <section class="section" id="shortlistSection" style="display:none">
+      <div class="section-header">
+        <div>
+          <h2>Actionable Shortlist</h2>
+          <div class="section-note">ตัวอย่างกฎที่เหมาะกับการทำ bundle, cross-sell messaging หรือ sales playbook</div>
+        </div>
+      </div>
+      <div class="helper-grid">
+        <div class="helper-card">
+          <h3>Highest Lift Rules</h3>
+          <div id="topLiftList"></div>
+        </div>
+        <div class="helper-card">
+          <h3>Highest Opportunity Rules</h3>
+          <div id="topVolumeList"></div>
+        </div>
+      </div>
+    </section>
+
+    <div class="footer"></div>
+  </div>
+
+  <script src="marketbasket.js"></script>
+</body>
+</html>
