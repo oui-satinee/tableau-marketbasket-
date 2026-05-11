@@ -379,21 +379,6 @@
       text-align: center;
       margin: 18px 0 10px;
     }
-    .config-panel {
-      margin-top: 22px;
-      background: linear-gradient(135deg, rgba(27,111,115,0.08), rgba(138,75,42,0.06));
-      border: 1px solid rgba(27,111,115,0.2);
-      border-radius: 24px;
-      padding: 22px;
-    }
-    .config-panel h2 {
-      margin: 0 0 8px 0;
-      font-size: 18px;
-      color: var(--accent);
-    }
-    .config-panel .section-note {
-      margin-bottom: 14px;
-    }
     .config-row {
       display: flex;
       gap: 12px;
@@ -504,17 +489,7 @@
 
     <div class="error-banner" id="errorBanner"></div>
 
-    <section class="config-panel" id="configPanel">
-      <h2>Data Source Configuration</h2>
-      <div class="section-note">เลือก worksheet ที่มีข้อมูล Market Basket Rules ของคุณ</div>
-      <div class="config-row">
-        <div class="field">
-          <label for="worksheetSelect">Worksheet</label>
-          <select id="worksheetSelect"><option value="">-- Select a worksheet --</option></select>
-        </div>
-        <button id="loadDataBtn" class="btn-primary">Load Data</button>
-      </div>
-    </section>
+
 
     <section class="section" id="dashboardContent" style="display:none">
       <div class="section-header">
@@ -668,6 +643,25 @@
           <h3>Highest Opportunity Rules</h3>
           <div id="topVolumeList"></div>
         </div>
+      </div>
+    </section>
+
+    <section class="section is-collapsed" id="configPanel">
+      <div class="section-header">
+        <div>
+          <h2>Data Source Configuration</h2>
+          <div class="section-note">เลือก worksheet ที่มีข้อมูล Market Basket Rules ของคุณ</div>
+        </div>
+        <button type="button" class="section-toggle" data-target="configPanel" aria-expanded="false">Show</button>
+      </div>
+      <div class="collapsible-body">
+      <div class="config-row">
+        <div class="field">
+          <label for="worksheetSelect">Worksheet</label>
+          <select id="worksheetSelect"><option value="">-- Select a worksheet --</option></select>
+        </div>
+        <button id="loadDataBtn" class="btn-primary">Load Data</button>
+      </div>
       </div>
     </section>
 
