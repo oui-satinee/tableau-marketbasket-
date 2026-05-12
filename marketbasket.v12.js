@@ -715,6 +715,16 @@
 
   // ─── Tableau Extension Bootstrap ────────────────────────
   function initializeExtension() {
+    // Attach toggle events immediately (before data load)
+    document.querySelectorAll(".section-toggle").forEach(function (button) {
+      button.addEventListener("click", function () {
+        var section = document.getElementById(button.dataset.target);
+        var collapsed = section.classList.toggle("is-collapsed");
+        button.textContent = collapsed ? "Show" : "Hide";
+        button.setAttribute("aria-expanded", collapsed ? "false" : "true");
+      });
+    });
+
     tableau.extensions.initializeAsync().then(function () {
       var dashboard = tableau.extensions.dashboardContent.dashboard;
 
