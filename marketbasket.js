@@ -500,10 +500,10 @@
     // Measure actual container widths
     var gridEl = document.querySelector(".chart-grid");
     var gridWidth = gridEl ? gridEl.offsetWidth : 1200;
-    var barCardWidth = Math.floor((gridWidth - 16) / 2); // 2 cols with gap
+    var barCardWidth = Math.floor((gridWidth - 16) / 2 * 0.8);
     var scatterCardWidth = gridWidth;
     var barHeight = 300;
-    var scatterHeight = 320;
+    var scatterHeight = 640;
 
     var topCategories = aggregateTopCategories(records);
     Plotly.newPlot("topCategoryChart", [{
