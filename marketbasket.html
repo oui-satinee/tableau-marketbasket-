@@ -36,7 +36,7 @@
     .shell {
       max-width: 1480px;
       margin: 0 auto;
-      padding: 28px;
+      padding: 16px 28px;
     }
     .hero {
       background: linear-gradient(135deg, #4d2d1f 0%, #8a4b2a 40%, #1b6f73 100%);
@@ -543,23 +543,6 @@
       <div id="statsLine" class="stats-line"></div>
     </section>
 
-    <section class="section is-collapsed" id="visualAnalysisSection" style="display:none">
-      <div class="section-header">
-        <div>
-          <h2>Visual Analysis</h2>
-          <div class="section-note">โฟกัสเฉพาะมุมที่ช่วยตัดสินใจเรื่องหมวดที่ขับ volume, cross-category flow และความสัมพันธ์ระหว่าง confidence กับ lift</div>
-        </div>
-        <button type="button" class="section-toggle" data-target="visualAnalysisSection" aria-expanded="false">Show</button>
-      </div>
-      <div class="collapsible-body">
-      <div class="chart-grid">
-        <div class="chart-card"><div id="topCategoryChart"></div></div>
-        <div class="chart-card"><div id="crossFlowChart"></div></div>
-        <div class="chart-card wide"><div id="scatterChart"></div></div>
-      </div>
-      </div>
-    </section>
-
     <section class="section" id="ruleDetailSection" style="display:none">
       <div class="section-header">
         <div>
@@ -589,6 +572,23 @@
           </thead>
           <tbody id="tableBody"></tbody>
         </table>
+      </div>
+    </section>
+
+    <section class="section is-collapsed" id="visualAnalysisSection" style="display:none">
+      <div class="section-header">
+        <div>
+          <h2>Visual Analysis</h2>
+          <div class="section-note">โฟกัสเฉพาะมุมที่ช่วยตัดสินใจเรื่องหมวดที่ขับ volume, cross-category flow และความสัมพันธ์ระหว่าง confidence กับ lift</div>
+        </div>
+        <button type="button" class="section-toggle" data-target="visualAnalysisSection" aria-expanded="false">Show</button>
+      </div>
+      <div class="collapsible-body">
+      <div class="chart-grid">
+        <div class="chart-card"><div id="topCategoryChart"></div></div>
+        <div class="chart-card"><div id="crossFlowChart"></div></div>
+        <div class="chart-card wide"><div id="scatterChart"></div></div>
+      </div>
       </div>
     </section>
 

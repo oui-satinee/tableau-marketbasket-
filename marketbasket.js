@@ -558,7 +558,7 @@
       title: { text: "Confidence vs Lift (bubble = pair count)", font: { size: 13 } },
       paper_bgcolor: "rgba(0,0,0,0)",
       plot_bgcolor: "rgba(0,0,0,0)",
-      margin: { t: 36, r: 10, b: 50, l: 60 },
+      margin: { t: 36, r: 10, b: 50, l: 55 },
       xaxis: { title: "Confidence", tickformat: ".0%", gridcolor: COLORS.grid },
       yaxis: { title: "Lift", gridcolor: COLORS.grid },
       font: { color: COLORS.text, size: 11 },
