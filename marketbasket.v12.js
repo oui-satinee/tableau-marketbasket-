@@ -696,14 +696,6 @@
       });
     document.getElementById("exportBtn").addEventListener("click", exportCsv);
     document.getElementById("resetBtn").addEventListener("click", resetFilters);
-    document.querySelectorAll(".section-toggle").forEach(function (button) {
-      button.addEventListener("click", function () {
-        var section = document.getElementById(button.dataset.target);
-        var collapsed = section.classList.toggle("is-collapsed");
-        button.textContent = collapsed ? "Show" : "Hide";
-        button.setAttribute("aria-expanded", collapsed ? "false" : "true");
-      });
-    });
   }
 
   function init() {
