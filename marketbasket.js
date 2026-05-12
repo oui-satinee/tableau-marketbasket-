@@ -497,17 +497,15 @@
   }
 
   function renderCharts(records) {
+    // Measure actual container widths
+    var gridEl = document.querySelector(".chart-grid");
+    var gridWidth = gridEl ? gridEl.offsetWidth : 1200;
+    var barCardWidth = Math.floor((gridWidth - 16) / 2); // 2 cols with gap
+    var scatterCardWidth = gridWidth;
+    var barHeight = 300;
+    var scatterHeight = 320;
+
     var topCategories = aggregateTopCategories(records);
-    var barLayout = {
-      paper_bgcolor: "rgba(0,0,0,0)",
-      plot_bgcolor: "rgba(0,0,0,0)",
-      margin: { t: 36, r: 70, b: 24, l: 120 },
-      bargap: 0.35,
-      yaxis: { autorange: "reversed", tickfont: { size: 10 } },
-      xaxis: { gridcolor: COLORS.grid },
-      font: { color: COLORS.text, size: 10 },
-      autosize: true
-    };
     Plotly.newPlot("topCategoryChart", [{
       x: topCategories.map(function (i) { return i.totalPairs; }),
       y: topCategories.map(function (i) { return i.name; }),
@@ -519,9 +517,18 @@
       textfont: { size: 10 },
       customdata: topCategories.map(function (i) { return [i.name, i.rules, i.avgConfidence]; }),
       hovertemplate: "%{customdata[0]}<br>Pair Count: %{x:,}<br>Rules: %{customdata[1]}<br>Avg Confidence: %{customdata[2]:.1%}<extra></extra>"
-    }], Object.assign({}, barLayout, {
-      title: { text: "Top Antecedent Categories", font: { size: 13 } }
-    }), { responsive: true, displayModeBar: false });
+    }], {
+      title: { text: "Top Antecedent Categories", font: { size: 13 } },
+      width: barCardWidth,
+      height: barHeight,
+      paper_bgcolor: "rgba(0,0,0,0)",
+      plot_bgcolor: "rgba(0,0,0,0)",
+      margin: { t: 36, r: 60, b: 24, l: 120 },
+      bargap: 0.35,
+      yaxis: { autorange: "reversed", tickfont: { size: 10 } },
+      xaxis: { gridcolor: COLORS.grid },
+      font: { color: COLORS.text, size: 10 }
+    }, { displayModeBar: false });
 
     var crossFlows = aggregateCrossFlows(records);
     Plotly.newPlot("crossFlowChart", [{
@@ -535,10 +542,18 @@
       textfont: { size: 10 },
       customdata: crossFlows.map(function (i) { return [i.flow, i.rules]; }),
       hovertemplate: "%{customdata[0]}<br>Pair Count: %{x:,}<br>Rules: %{customdata[1]}<extra></extra>"
-    }], Object.assign({}, barLayout, {
+    }], {
       title: { text: "Top Cross-Category Flows", font: { size: 13 } },
-      margin: { t: 36, r: 70, b: 24, l: 150 }
-    }), { responsive: true, displayModeBar: false });
+      width: barCardWidth,
+      height: barHeight,
+      paper_bgcolor: "rgba(0,0,0,0)",
+      plot_bgcolor: "rgba(0,0,0,0)",
+      margin: { t: 36, r: 60, b: 24, l: 150 },
+      bargap: 0.35,
+      yaxis: { autorange: "reversed", tickfont: { size: 10 } },
+      xaxis: { gridcolor: COLORS.grid },
+      font: { color: COLORS.text, size: 10 }
+    }, { displayModeBar: false });
 
     Plotly.newPlot("scatterChart", [{
       x: records.map(function (i) { return i.confidence; }),
@@ -546,7 +561,7 @@
       mode: "markers",
       type: "scatter",
       marker: {
-        size: records.map(function (i) { return Math.max(6, Math.min(22, i.pair_count / 250)); }),
+        size: records.map(function (i) { return Math.max(6, Math.min(20, i.pair_count / 250)); }),
         color: records.map(function (i) { return i.analysis_type === "cross_category" ? COLORS.cross : COLORS.within; }),
         opacity: 0.7,
         line: { width: 1, color: "#ffffff" }
@@ -556,14 +571,15 @@
       hovertemplate: "%{text}<br>Confidence: %{x:.1%}<br>Lift: %{y:.2f}<br>Pair Count: %{customdata[0]:,}<br>Itemset: %{customdata[1]}<br>Type: %{customdata[2]}<extra></extra>"
     }], {
       title: { text: "Confidence vs Lift (bubble = pair count)", font: { size: 13 } },
+      width: scatterCardWidth,
+      height: scatterHeight,
       paper_bgcolor: "rgba(0,0,0,0)",
       plot_bgcolor: "rgba(0,0,0,0)",
-      margin: { t: 36, r: 10, b: 50, l: 55 },
+      margin: { t: 36, r: 20, b: 50, l: 55 },
       xaxis: { title: "Confidence", tickformat: ".0%", gridcolor: COLORS.grid },
       yaxis: { title: "Lift", gridcolor: COLORS.grid },
-      font: { color: COLORS.text, size: 11 },
-      autosize: true
-    }, { responsive: true, displayModeBar: false });
+      font: { color: COLORS.text, size: 11 }
+    }, { displayModeBar: false });
   }
 
   function renderShortlists(records) {
