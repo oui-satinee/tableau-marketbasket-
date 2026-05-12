@@ -510,7 +510,7 @@
       height: 300,
       autosize: true,
       yaxis: { autorange: "reversed", tickfont: { size: 10 }, showticklabels: true, automargin: true },
-      xaxis: { gridcolor: COLORS.grid },
+      xaxis: { gridcolor: COLORS.grid, showticklabels: false, showgrid: true },
       font: { color: COLORS.text, size: 10 }
     };
 
