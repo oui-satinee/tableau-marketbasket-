@@ -500,7 +500,7 @@
     // Measure actual container widths
     var gridEl = document.querySelector(".chart-grid");
     var gridWidth = gridEl ? gridEl.offsetWidth : 1200;
-    var barCardWidth = Math.floor((gridWidth - 16) / 2 * 0.8);
+    var barCardWidth = Math.floor((gridWidth - 16) / 2 * 0.6);
     var scatterCardWidth = gridWidth;
     var barHeight = 300;
     var scatterHeight = 320;
@@ -571,7 +571,7 @@
       hovertemplate: "%{text}<br>Confidence: %{x:.1%}<br>Lift: %{y:.2f}<br>Pair Count: %{customdata[0]:,}<br>Itemset: %{customdata[1]}<br>Type: %{customdata[2]}<extra></extra>"
     }], {
       title: { text: "Confidence vs Lift (bubble = pair count)", font: { size: 13 } },
-      width: 640,
+      width: scatterCardWidth,
       height: scatterHeight,
       paper_bgcolor: "rgba(0,0,0,0)",
       plot_bgcolor: "rgba(0,0,0,0)",
