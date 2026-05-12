@@ -580,6 +580,13 @@
       yaxis: { title: "Lift", gridcolor: COLORS.grid },
       font: { color: COLORS.text, size: 11 }
     }, { displayModeBar: false });
+
+    // Force Plotly to recalculate sizes after DOM is ready
+    setTimeout(function () {
+      Plotly.Plots.resize("topCategoryChart");
+      Plotly.Plots.resize("crossFlowChart");
+      Plotly.Plots.resize("scatterChart");
+    }, 200);
   }
 
   function renderShortlists(records) {
