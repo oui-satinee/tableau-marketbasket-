@@ -503,7 +503,7 @@
     var barCardWidth = Math.floor((gridWidth - 16) / 2 * 0.8);
     var scatterCardWidth = gridWidth;
     var barHeight = 300;
-    var scatterHeight = 640;
+    var scatterHeight = 320;
 
     var topCategories = aggregateTopCategories(records);
     Plotly.newPlot("topCategoryChart", [{
@@ -571,7 +571,7 @@
       hovertemplate: "%{text}<br>Confidence: %{x:.1%}<br>Lift: %{y:.2f}<br>Pair Count: %{customdata[0]:,}<br>Itemset: %{customdata[1]}<br>Type: %{customdata[2]}<extra></extra>"
     }], {
       title: { text: "Confidence vs Lift (bubble = pair count)", font: { size: 13 } },
-      width: scatterCardWidth,
+      width: 640,
       height: scatterHeight,
       paper_bgcolor: "rgba(0,0,0,0)",
       plot_bgcolor: "rgba(0,0,0,0)",
